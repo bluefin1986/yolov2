@@ -51,6 +51,8 @@ stdlib.h
 -
 stdio.h
 -
+sys/dir.h
+-
 
 /Users/matt/Documents/deeplearning/darknet-train/examples/detector.c
 ../include/darknet.h
@@ -674,6 +676,8 @@ cuda.h
 stdio.h
 -
 math.h
+-
+unistd.h
 -
 stb_image.h
 /Users/matt/Documents/deeplearning/darknet-train/src/stb_image.h

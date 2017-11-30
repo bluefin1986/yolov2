@@ -4,6 +4,7 @@
 #include "cuda.h"
 #include <stdio.h>
 #include <math.h>
+#include <unistd.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -243,7 +244,14 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
         char labelstr[4096] = {0};
         int class = -1;
         for(j = 0; j < classes; ++j){
+
             if (probs[i][j] > thresh){
+
+                for(int k = 0; k < classes; ++k) {
+                    fprintf(stderr, "prob[%d]:[%f]\t",k,probs[i][k]);
+                }
+                fprintf(stderr, "\n");
+
                 if (class < 0) {
                     strcat(labelstr, names[j]);
                     class = j;
@@ -251,7 +259,20 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
                     strcat(labelstr, ", ");
                     strcat(labelstr, names[j]);
                 }
+
                 printf("%s: %.0f%%\n", names[j], probs[i][j]*100);
+                FILE *fp;
+                if((fp=fopen("/Users/matt/Downloads/train/recognize.txt","a+"))==NULL)  /*以只写方式打开文件*/
+                {
+                    printf("cannot open file!/n");
+                    exit(0);
+                }
+                else {
+                    char record[1000];
+                    sprintf(record, "%s: %.0f%%\n", names[j], probs[i][j]*100);
+                    fputs(record, fp);
+                    fclose(fp);
+                }
             }
         }
         if(class >= 0){

@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <sys/dir.h>
 extern void predict_classifier(char *datacfg, char *cfgfile, char *weightfile, char *filename, int top);
 extern void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen);
 extern void run_yolo(int argc, char **argv);
@@ -381,7 +381,7 @@ void visualize(char *cfgfile, char *weightfile)
     cvWaitKey(0);
 #endif
 }
-
+char record[2000];
 int main(int argc, char **argv)
 {
     //test_resize("data/bad.jpg");
@@ -421,7 +421,33 @@ int main(int argc, char **argv)
         char *filename = (argc > 4) ? argv[4]: 0;
         char *outfile = find_char_arg(argc, argv, "-out", 0);
         int fullscreen = find_arg(argc, argv, "-fullscreen");
-        test_detector("cfg/voc.data", argv[2], argv[3], filename, thresh, .5, outfile, fullscreen);
+        find_char_arg(argc, argv, "-recordFile", record);
+
+        DIR *pdir;
+        struct dirent *pdirent;
+        char temp[2000];
+        pdir = opendir(filename);
+
+        if(pdir)
+        {
+            while((pdirent = readdir(pdir)))
+            {
+                //跳过"."和".."
+                if(strstr(pdirent->d_name,"jpg") == NULL &&
+                   strstr(pdirent->d_name,"jpeg") == NULL &&
+                   strstr(pdirent->d_name,"png") == NULL &&
+                   strstr(pdirent->d_name,"JPG") == NULL &&
+                   strstr(pdirent->d_name,"JPEG") == NULL &&
+                   strstr(pdirent->d_name,"PNG") == NULL )
+                    continue;
+                sprintf(temp, "%s/%s", filename, pdirent->d_name);
+                test_detector("cfg/voc.data", argv[2], argv[3], temp, thresh, .5, outfile, fullscreen);
+
+
+
+            }
+        }
+//        test_detector("/Users/Guava/Desktop/workspace/deeplearning/20171129/darknet-train/cfg/voc.data", argv[2], argv[3], filename, thresh, .5, outfile, fullscreen);
     } else if (0 == strcmp(argv[1], "cifar")){
         run_cifar(argc, argv);
     } else if (0 == strcmp(argv[1], "go")){
@@ -488,3 +514,6 @@ int main(int argc, char **argv)
     return 0;
 }
 
+char *recordFile() {
+    return record;
+}

@@ -1,6 +1,6 @@
 #include "../include/darknet.h"
 
-static int coco_ids[] = {1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,31,32,33,34,35,36,37,38,39,40,41,42,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,67,70,72,73,74,75,76,77,78,79,80,81,82,84,85,86,87,88,89,90};
+static int coco_ids[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30};
 
 void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear)
 {
@@ -561,7 +561,7 @@ void validate_detector_recall(char *cfgfile, char *weightfile)
         free_image(sized);
     }
 }
-
+network *net;
 void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen)
 {
     list *options = read_data_cfg(datacfg);
@@ -569,7 +569,9 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
     char **names = get_labels(name_list);
 
     image **alphabet = load_alphabet();
-    network *net = load_network(cfgfile, weightfile, 0);
+    if(!net) {
+        net = load_network(cfgfile, weightfile, 0);
+    }
     set_batch_network(net, 1);
     srand(2222222);
     double time;
@@ -608,6 +610,23 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
         time=what_time_is_it_now();
         network_predict(net, X);
         printf("%s: Predicted in %f seconds.\n", input, what_time_is_it_now()-time);
+
+
+        FILE *fp;
+        if((fp=fopen("/Users/matt/Downloads/train/recognize.txt","a+"))==NULL)  /*以只写方式打开文件*/
+        {
+            printf("cannot open file!/n");
+            exit(0);
+        }
+        else {
+            char record[2000];
+            sprintf(record, "%s: \n", input);
+            fputs(record, fp);
+            fclose (fp);
+        }
+
+        l = net->layers[net->n-1];
+
         get_region_boxes(l, im.w, im.h, net->w, net->h, thresh, probs, boxes, masks, 0, 0, hier_thresh, 1);
         //if (nms) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
         if (nms) do_nms_sort(boxes, probs, l.w*l.h*l.n, l.classes, nms);

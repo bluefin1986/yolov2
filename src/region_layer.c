@@ -430,10 +430,16 @@ void get_region_boxes(layer l, int w, int h, int netw, int neth, float thresh, f
                 }
             } else {
                 float max = 0;
+//                int findPig = 0;
                 for(j = 0; j < l.classes; ++j){
                     int class_index = entry_index(l, 0, n*l.w*l.h + i, l.coords + 1 + j);
                     float prob = scale*predictions[class_index];
-                    probs[index][j] = (prob > thresh) ? prob : 0;
+
+//                    probs[index][j] = (prob > thresh) ? prob : 0;
+                    probs[index][j] = prob;
+//                    if(prob > thresh){
+//                        findPig = 1;
+//                    }
                     if(prob > max) max = prob;
                     // TODO REMOVE
                     // if (j == 56 ) probs[index][j] = 0; 
@@ -446,6 +452,12 @@ void get_region_boxes(layer l, int w, int h, int netw, int neth, float thresh, f
                        }
                      */
                 }
+//                if(findPig){
+//                    for(int k = 0; k < l.classes; ++k) {
+//                        fprintf(stderr, "prob[%d]:[%f]\t",k,probs[index][k]);
+//                    }
+//                    fprintf(stderr, "\n");
+//                }
                 probs[index][l.classes] = max;
             }
             if(only_objectness){

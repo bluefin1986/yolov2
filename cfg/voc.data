@@ -1,6 +1,6 @@
 classes= 30
 train  = /Users/matt/Downloads/train/outputXMLSmall/infrared_train.txt
 valid  = /Users/matt/Downloads/train/outputXMLSmall/infrared_val.txt
-names = data/voc.names
+names = /Users/matt/Documents/deeplearning/darknet-train/data/voc.names
 backup = backup
 
