@@ -620,7 +620,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
         }
         else {
             char record[2000];
-            sprintf(record, "%s: \n", input);
+            sprintf(record, "---------new image----------\n%s: \n", input);
             fputs(record, fp);
             fclose (fp);
         }
