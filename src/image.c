@@ -239,7 +239,10 @@ image **load_alphabet()
 void draw_detections(image im, int num, float thresh, box *boxes, float **probs, float **masks, char **names, image **alphabet, int classes)
 {
     int i,j;
-
+    float *result = malloc(num * sizeof(float));
+    for(i = 0; i < classes; i++) {
+        result[i] = 0;
+    }
     for(i = 0; i < num; ++i){
         char labelstr[4096] = {0};
         int class = -1;
@@ -261,6 +264,9 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
                 }
 
                 printf("%s: %.0f%%\n", names[j], probs[i][j]*100);
+                if(probs[i][j] > result[j]) {
+                    result[j] = probs[i][j];
+                }
                 FILE *fp;
                 if((fp=fopen("/Users/matt/Downloads/train/recognize.txt","a+"))==NULL)  /*以只写方式打开文件*/
                 {
@@ -326,6 +332,26 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
             }
         }
     }
+    char record[5000];
+    for(i = 0; i < classes; i++) {
+        if(i == 0) {
+            sprintf(record, "%d:%.06f, ", i, result[i]);
+        }
+        else {
+            sprintf(record, "%s%d:%.06f, ", record, i, result[i]);
+        }
+    }
+    FILE *fp;
+    if((fp=fopen("/Users/matt/Downloads/train/recognize.txt","a+"))==NULL)  /*以只写方式打开文件*/
+    {
+        printf("cannot open file!/n");
+        exit(0);
+    }
+    else {
+        fputs(record, fp);
+        fclose(fp);
+    }
+
 }
 
 void transpose_image(image im)
