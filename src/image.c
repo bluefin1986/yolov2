@@ -243,6 +243,18 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
     for(i = 0; i < classes; i++) {
         result[i] = 0;
     }
+    {
+        FILE *fp;
+        if((fp=fopen("/Users/Guava/Desktop/workspace/deeplearning/20171129/recognize.txt","a+"))==NULL)  /*以只写方式打开文件*/
+        {
+            printf("cannot open file!/n");
+            exit(0);
+        }
+        else {
+            fputs("---------pig result----------\n", fp);
+            fclose(fp);
+        }
+    }
     for(i = 0; i < num; ++i){
         char labelstr[4096] = {0};
         int class = -1;
@@ -332,14 +344,9 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
             }
         }
     }
-    char record[5000];
+    char record[5000] = "---------pigs rate----------\n";
     for(i = 0; i < classes; i++) {
-        if(i == 0) {
-            sprintf(record, "%d:%.06f, ", i, result[i]);
-        }
-        else {
-            sprintf(record, "%s%d:%.06f, ", record, i, result[i]);
-        }
+        sprintf(record, "%s%d:%.06f, ", record, i, result[i]);
     }
     FILE *fp;
     if((fp=fopen("/Users/matt/Downloads/train/recognize.txt","a+"))==NULL)  /*以只写方式打开文件*/
